@@ -17,7 +17,7 @@ Traditional job platforms match candidates solely on resume keywords and prior e
 
 ## 💡 Solution Overview
 
-**EquiHire** replaces manual keyword filtering with an autonomous three-tier agent pipeline. A candidate provides minimal natural input (a voice transcript or simple bio), and specialized agents extract skills, audit listings, evaluate infrastructure readiness, and draft accommodation proposals.
+**Nivara** replaces manual keyword filtering with an autonomous three-tier agent pipeline. A candidate provides minimal natural input (a voice transcript or simple bio), and specialized agents extract skills, audit listings, evaluate infrastructure readiness, and draft accommodation proposals.
 
               [Candidate Input: Natural Bio / Voice]
                                  │
