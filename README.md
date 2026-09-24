@@ -66,7 +66,7 @@ Traditional job platforms match candidates solely on resume keywords and prior e
 ## 📂 Project Structure
 
 ```text
-equihire/
+Nivara/
 ├── README.md
 ├── requirements.txt
 ├── .env.example
