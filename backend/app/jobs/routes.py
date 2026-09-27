@@ -113,3 +113,27 @@ def match_candidate_to_job(
             }
 
     raise HTTPException(status_code=404, detail="Job not found")
+
+@router.post("/recommend")
+def recommend_jobs(candidate: Candidate):
+    recommendations = []
+
+    for job in JOBS:
+        job_data = job.model_dump()
+
+        match_result = generate_job_match(
+            candidate=candidate,
+            job=job_data,
+        )
+
+        recommendations.append({
+            "job_id": job.id,
+            "title": job.title,
+            "company": job.company,
+            "match_analysis": match_result,
+        })
+
+    return {
+        "candidate": candidate.model_dump(),
+        "recommendations": recommendations,
+    }
