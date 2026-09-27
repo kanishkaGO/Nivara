@@ -4,6 +4,7 @@ from typing import List, Optional
 from .data import JOBS
 from .schemas import Job
 from .accessibility import AccessibilityRequest, AccessibilityResponse
+from .matching import generate_job_match
 
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -87,5 +88,27 @@ def analyze_accessibility(
                 missing_accommodations=missing,
                 compatibility_score=score,
             )
+
+    raise HTTPException(status_code=404, detail="Job not found")
+
+
+@router.post("/{job_id}/match")
+def match_candidate_to_job(
+    job_id: str,
+    candidate: dict,
+):
+    for job in JOBS:
+        if job.id == job_id:
+            job_data = job.model_dump()
+
+            match_result = generate_job_match(
+                candidate=candidate,
+                job=job_data,
+            )
+
+            return {
+                "job_id": job.id,
+                "match_analysis": match_result,
+            }
 
     raise HTTPException(status_code=404, detail="Job not found")
