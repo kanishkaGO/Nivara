@@ -2,6 +2,7 @@ import ollama
 
 
 def generate_job_match(candidate: dict, job: dict) -> str:
+    candidate = candidate.model_dump()
     prompt = f"""
 You are Nivara's Job Matching Agent.
 

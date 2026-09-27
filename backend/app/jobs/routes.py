@@ -4,6 +4,7 @@ from typing import List, Optional
 from .data import JOBS
 from .schemas import Job
 from .accessibility import AccessibilityRequest, AccessibilityResponse
+from .candidate import Candidate
 from .matching import generate_job_match
 
 
@@ -95,7 +96,7 @@ def analyze_accessibility(
 @router.post("/{job_id}/match")
 def match_candidate_to_job(
     job_id: str,
-    candidate: dict,
+    candidate: Candidate,
 ):
     for job in JOBS:
         if job.id == job_id:
