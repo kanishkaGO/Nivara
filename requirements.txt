@@ -1,6 +1,8 @@
-crewai
-crewai-tools
-langchain-google-genai
-streamlit
-python-dotenv
+fastapi
+uvicorn
+python-multipart
+ollama
 pydantic
+python-dotenv
+pypdf
+python-docx
