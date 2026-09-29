@@ -29,6 +29,7 @@ Return ONLY valid JSON using exactly this structure:
     "education": [
         {{
             "degree": "",
+            "field_of_study": "",
             "institution": "",
             "year": ""
         }}

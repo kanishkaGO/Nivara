@@ -10,6 +10,7 @@ class Experience(BaseModel):
 
 class Education(BaseModel):
     degree: str = ""
+    field_of_study: str = ""
     institution: str = ""
     year: str = ""
 

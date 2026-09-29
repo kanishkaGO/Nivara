@@ -10,7 +10,7 @@ from app.schemas.candidate import (
 
 
 router = APIRouter(
-    prefix="/candidate",
+    prefix="/api/v1/candidate",
     tags=["Candidate"]
 )
 
