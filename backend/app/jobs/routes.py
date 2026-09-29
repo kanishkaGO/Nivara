@@ -6,7 +6,7 @@ from .schemas import Job
 from .accessibility import AccessibilityRequest, AccessibilityResponse
 from .candidate import Candidate
 from .matching import generate_job_match
-
+from .adzuna import search_adzuna_jobs
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
@@ -41,6 +41,17 @@ def get_jobs(
         ]
 
     return results
+@router.get("/live", response_model=List[Job])
+def get_live_jobs(
+    search: str = Query(...),
+    location: str = Query(default="India"),
+):
+    return search_adzuna_jobs(
+        query=search,
+        location=location,
+        page=1,
+        results_per_page=10,
+    )
 
 
 @router.get("/{job_id}", response_model=Job)
