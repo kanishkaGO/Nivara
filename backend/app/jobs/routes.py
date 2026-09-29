@@ -127,48 +127,74 @@ def match_candidate_to_job(
 
 @router.post("/recommend")
 def recommend_jobs(candidate: Candidate):
-    candidate_skills = {
-        skill.lower()
-        for skill in candidate.skills
-    }
-
     recommendations = []
 
     for job in JOBS:
-        job_skills = {
-            skill.lower()
-            for skill in job.skills
-        }
+        job_data = job.model_dump()
 
-        # Fast deterministic skill matching
-        matched_skills = [
-            skill for skill in job.skills
-            if skill.lower() in candidate_skills
-        ]
-
-        if not matched_skills:
-            continue
-
-        skill_score = round(
-            (len(matched_skills) / len(job_skills)) * 100
+        match_result = generate_job_match(
+            candidate=candidate,
+            job=job_data,
         )
+
+        # Only recommend jobs with at least one matching skill.
+        if not match_result.skill_match.startswith("Matched skills:"):
+            continue
 
         recommendations.append({
             "job_id": job.id,
             "title": job.title,
             "company": job.company,
-            "skill_match_score": skill_score,
-            "matched_skills": list(matched_skills),
+            "match_score": match_result.match_score,
+            "skill_match": match_result.skill_match,
+            "accessibility_match": match_result.accessibility_match,
+            "work_preference_match": match_result.work_preference_match,
+            "concerns": match_result.concerns,
+            "overall_explanation": match_result.overall_explanation,
             "accessibility": job.accessibility,
+            "accessibility_info_available": job.accessibility_info_available,
             "work_mode": job.work_mode,
+            "experience": job.experience,
         })
 
     recommendations.sort(
-        key=lambda x: x["skill_match_score"],
-        reverse=True
+        key=lambda x: x["match_score"],
+        reverse=True,
     )
 
     return {
         "candidate": candidate.model_dump(),
         "recommendations": recommendations,
     }
+from .agent import generate_match_explanation
+
+@router.post("/{job_id}/explain-match")
+def explain_job_match(
+    job_id: str,
+    candidate: Candidate,
+):
+    for job in JOBS:
+        if job.id == job_id:
+            job_data = job.model_dump()
+
+            match_result = generate_job_match(
+                candidate=candidate,
+                job=job_data,
+            )
+
+            ai_explanation = generate_match_explanation(
+                candidate=candidate.model_dump(),
+                job=job_data,
+                match_result=match_result.model_dump(),
+            )
+
+            return {
+                "job_id": job.id,
+                "match_score": match_result.match_score,
+                "ai_explanation": ai_explanation,
+            }
+
+    raise HTTPException(
+        status_code=404,
+        detail="Job not found",
+    )

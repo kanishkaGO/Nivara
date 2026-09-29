@@ -11,6 +11,8 @@ JOBS = [
         description="Develop and maintain Python applications and REST APIs.",
         skills=["Python", "FastAPI", "SQL", "REST API"],
         accessibility=["Remote work", "Flexible hours", "Screen reader compatible"],
+        accessibility_info_available=True,
+        accessibility_info_status="available",
         experience="1-3 years"
     ),
     Job(
@@ -22,6 +24,8 @@ JOBS = [
         description="Build accessible web interfaces using React and JavaScript.",
         skills=["React", "JavaScript", "HTML", "CSS"],
         accessibility=["Accessible office", "Flexible hours", "Captioned meetings"],
+        accessibility_info_available=True,
+        accessibility_info_status="available",
         experience="1-2 years"
     ),
     Job(
@@ -33,6 +37,8 @@ JOBS = [
         description="Analyze business data and create reports using Python and SQL.",
         skills=["Python", "SQL", "Excel", "Data Analysis"],
         accessibility=["Remote work", "Flexible hours"],
+        accessibility_info_available=True,
+        accessibility_info_status="available",
         experience="1-3 years"
     )
 ]
