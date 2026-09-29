@@ -7,7 +7,7 @@ from .experience_extractor import extract_experience
 from .schemas import Job
 from .skill_extractor import extract_skills
 from .accessibility_extractor import extract_accessibility
-
+from .requirements_extractor import extract_job_requirements
 
 load_dotenv()
 
@@ -86,7 +86,13 @@ def search_adzuna_jobs(
                 accessibility_info_available=bool(
                     extracted_accessibility
                 ),
+                accessibility_info_status=(
+                    "available"
+                    if extracted_accessibility
+                    else "not_mentioned"
+                ),
                 experience=extract_experience(description),
+                job_requirements=extract_job_requirements(description),
             )
         )
 
