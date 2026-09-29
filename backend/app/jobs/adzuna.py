@@ -1,9 +1,13 @@
 import os
 import requests
+from .work_mode_extractor import extract_work_mode
 
 from dotenv import load_dotenv
-from .skill_extractor import extract_skills
+from .experience_extractor import extract_experience
 from .schemas import Job
+from .skill_extractor import extract_skills
+from .accessibility_extractor import extract_accessibility
+
 
 load_dotenv()
 
@@ -20,7 +24,9 @@ def search_adzuna_jobs(
     app_key = os.getenv("ADZUNA_APP_KEY")
 
     if not app_id or not app_key:
-        raise RuntimeError("Adzuna API credentials are not configured.")
+        raise RuntimeError(
+            "Adzuna API credentials are not configured."
+        )
 
     url = f"{ADZUNA_BASE_URL}/{page}"
 
@@ -45,25 +51,42 @@ def search_adzuna_jobs(
     jobs = []
 
     for item in data.get("results", []):
+        description = item.get("description", "")
+        extracted_skills = extract_skills(description)
+        extracted_accessibility = extract_accessibility(description)
+
         jobs.append(
             Job(
-                id=item.get("id", item.get("adref", "")),
-                title=item.get("title", "Unknown"),
-                company=item.get("company", {}).get(
+                id=item.get(
+                    "id",
+                    item.get("adref", ""),
+                ),
+                title=item.get(
+                    "title",
+                    "Unknown",
+                ),
+                company=item.get(
+                    "company",
+                    {}
+                ).get(
                     "display_name",
                     "Unknown",
                 ),
-                location=item.get("location", {}).get(
+                location=item.get(
+                    "location",
+                    {}
+                ).get(
                     "display_name",
                     location,
                 ),
-                work_mode="unknown",
-                description=item.get("description", ""),
-                skills=extract_skills(
-                    item.get("description", "")
+                work_mode=extract_work_mode(description),
+                description=description,
+                skills=extracted_skills,
+                accessibility=extracted_accessibility,
+                accessibility_info_available=bool(
+                    extracted_accessibility
                 ),
-                accessibility=[],
-                experience=None,
+                experience=extract_experience(description),
             )
         )
 

@@ -11,4 +11,5 @@ class Job(BaseModel):
     description: str
     skills: List[str]
     accessibility: List[str] = Field(default_factory=list)
+    accessibility_info_available: bool = False
     experience: Optional[str] = None
