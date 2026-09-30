@@ -9,7 +9,8 @@ def analyze_resume(resume_text: str) -> CandidateProfile:
     prompt = f"""
 You are Nivara's resume analysis AI.
 
-Nivara is an inclusive career platform for Persons with Disabilities (PWDs).
+Nivara is an inclusive career platform for Persons with Disabilities
+(PWDs).
 
 Analyze the following resume and return ONLY valid JSON.
 
@@ -80,7 +81,6 @@ RESUME:
         data = json.loads(raw_response)
 
         # Normalize education returned by Ollama.
-        # Ollama may sometimes return strings instead of objects.
         normalized_education = []
 
         for item in data.get("education", []):
@@ -98,7 +98,6 @@ RESUME:
         data["education"] = normalized_education
 
         # Normalize experience returned by Ollama.
-        # Ollama may sometimes return strings instead of objects.
         normalized_experience = []
 
         for item in data.get("experience", []):
@@ -115,7 +114,21 @@ RESUME:
 
         data["experience"] = normalized_experience
 
-        # Convert Ollama JSON into our Pydantic model
+        # Normalize certifications returned by Ollama.
+        normalized_certifications = []
+
+        for item in data.get("certifications", []):
+            if isinstance(item, str):
+                normalized_certifications.append(item)
+
+            elif isinstance(item, dict):
+                certification = item.get("certification")
+
+                if certification:
+                    normalized_certifications.append(certification)
+
+        data["certifications"] = normalized_certifications
+
         return CandidateProfile(**data)
 
     except json.JSONDecodeError as e:
