@@ -13,20 +13,20 @@ def _experience_range(value):
 
     text = str(value).lower()
 
-    # Example: "1-3 years" or "1 to 3 years"
-    match = re.search(r"(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)", text)
+    match = re.search(
+        r"(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)",
+        text,
+    )
 
     if match:
         return float(match.group(1)), float(match.group(2))
 
-    # Example: "3+ years"
     match = re.search(r"(\d+(?:\.\d+)?)\s*\+", text)
 
     if match:
         minimum = float(match.group(1))
         return minimum, None
 
-    # Example: "2 years"
     match = re.search(r"(\d+(?:\.\d+)?)\s*years?", text)
 
     if match:
@@ -49,22 +49,16 @@ def generate_job_match(candidate, job: dict) -> MatchResult:
     else:
         skill_score = 0
 
-    # -------------------------
-    # Experience matching
-    # -------------------------
-
     candidate_experience = _experience_range(candidate.experience)
     job_experience = _experience_range(job.get("experience"))
 
     if candidate_experience is None or job_experience is None:
         experience_score = 50
         experience_text = "Experience information is incomplete."
-
     else:
         candidate_min, candidate_max = candidate_experience
         job_min, job_max = job_experience
 
-        # Candidate meets the minimum requirement.
         if candidate_max >= job_min:
             experience_score = 100
             experience_text = (
@@ -75,10 +69,6 @@ def generate_job_match(candidate, job: dict) -> MatchResult:
             experience_text = (
                 "The candidate has less experience than the stated requirement."
             )
-
-    # -------------------------
-    # Accessibility matching
-    # -------------------------
 
     candidate_needs = _normalize(candidate.accessibility_needs)
     job_accessibility = _normalize(job.get("accessibility", []))
@@ -117,18 +107,12 @@ def generate_job_match(candidate, job: dict) -> MatchResult:
                 "The stated accessibility needs are not explicitly listed."
             )
 
-    # -------------------------
-    # Work preference matching
-    # -------------------------
-
     preferences = _normalize(candidate.work_preferences)
     work_mode = str(job.get("work_mode", "unknown")).lower()
 
     if not preferences:
         preference_score = 100
-        preference_text = (
-            "No specific work preference was provided."
-        )
+        preference_text = "No specific work preference was provided."
 
     elif work_mode == "unknown":
         preference_score = 50
@@ -137,8 +121,7 @@ def generate_job_match(candidate, job: dict) -> MatchResult:
         )
 
     elif any(
-        preference in work_mode
-        or work_mode in preference
+        preference in work_mode or work_mode in preference
         for preference in preferences
     ):
         preference_score = 100
@@ -152,27 +135,15 @@ def generate_job_match(candidate, job: dict) -> MatchResult:
             "The job work mode does not match the candidate's stated preference."
         )
 
-    # -------------------------
-    # Overall score
-    # -------------------------
-
     match_score = round(
-        (
-            skill_score * 0.40
-            + experience_score * 0.20
-            + accessibility_score * 0.25
-            + preference_score * 0.15
-        )
+        skill_score * 0.40
+        + experience_score * 0.20
+        + accessibility_score * 0.25
+        + preference_score * 0.15
     )
-
-    # -------------------------
-    # Concerns
-    # -------------------------
 
     concerns = []
 
-    # Only report missing job skills when the candidate
-    # actually fails to match some required job skills.
     missing_job_skills = job_skills - candidate_skills
 
     if missing_job_skills:
@@ -194,10 +165,6 @@ def generate_job_match(candidate, job: dict) -> MatchResult:
         concerns.append(
             "The stated work preference does not match the job work mode."
         )
-
-    # -------------------------
-    # Explanations
-    # -------------------------
 
     skill_text = (
         "Matched skills: "

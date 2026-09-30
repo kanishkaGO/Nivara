@@ -1,6 +1,5 @@
 from .schemas import Job
 
-
 JOBS = [
     Job(
         id="J001",

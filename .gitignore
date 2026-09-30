@@ -1,4 +1,25 @@
-.venv/
+# Python
 __pycache__/
+*.py[cod]
+*.pyo
 *.pyc
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables
 .env
+
+# Uploaded files
+uploads/
+*.pdf
+*.doc
+*.docx
+
+# Test/runtime files
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
