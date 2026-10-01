@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from pydantic import BaseModel, EmailStr, Field
 
 class Experience(BaseModel):
     job_title: str = ""
@@ -68,3 +68,9 @@ class CandidateProfile(BaseModel):
     work_preferences: WorkPreferences = Field(
         default_factory=WorkPreferences
     )
+
+class BasicProfileUpdate(BaseModel):
+    name: str
+    email: EmailStr
+    phone: str
+    location: str

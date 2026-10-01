@@ -1,12 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app.schemas.candidate import BasicProfileUpdate
 
 from app.core.database import get_db
 from app.models.candidate import Candidate
-from app.schemas.candidate import (
-    AccessibilityRequirements,
-    WorkPreferences,
-)
 
 
 router = APIRouter(
@@ -50,12 +47,10 @@ async def get_candidate(
         "work_preferences": candidate.work_preferences,
     }
 
-
-@router.put("/{candidate_id}/accessibility")
-async def update_accessibility(
+@router.get("/{candidate_id}/completeness")
+async def get_profile_completeness(
     candidate_id: int,
-    requirements: AccessibilityRequirements,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db)
 ):
     candidate = (
         db.query(Candidate)
@@ -69,25 +64,53 @@ async def update_accessibility(
             detail="Candidate not found."
         )
 
-    candidate.accessibility_requirements = requirements.model_dump()
-
-    db.commit()
-    db.refresh(candidate)
-
-    return {
-        "message": "Accessibility requirements updated",
-        "candidate_id": candidate.id,
-        "accessibility_requirements": (
+    sections = {
+        "basic_information": bool(
+            candidate.name
+            and candidate.email
+            and candidate.phone
+            and candidate.location
+        ),
+        "skills": bool(candidate.skills),
+        "education": bool(candidate.education),
+        "experience": bool(candidate.experience),
+        "projects": bool(candidate.projects),
+        "certifications": bool(candidate.certifications),
+        "languages": bool(candidate.languages),
+        "accessibility_requirements": bool(
             candidate.accessibility_requirements
+        ),
+        "work_preferences": bool(
+            candidate.work_preferences
         ),
     }
 
+    completed = sum(sections.values())
+    total = len(sections)
 
-@router.put("/{candidate_id}/preferences")
-async def update_preferences(
+    completion_percentage = round(
+        (completed / total) * 100
+    )
+
+    missing_sections = [
+        section
+        for section, completed_status in sections.items()
+        if not completed_status
+    ]
+
+    return {
+        "candidate_id": candidate.id,
+        "completion_percentage": completion_percentage,
+        "completed_sections": completed,
+        "total_sections": total,
+        "missing_sections": missing_sections,
+    }
+
+@router.put("/{candidate_id}")
+async def update_basic_profile(
     candidate_id: int,
-    preferences: WorkPreferences,
-    db: Session = Depends(get_db),
+    profile: BasicProfileUpdate,
+    db: Session = Depends(get_db)
 ):
     candidate = (
         db.query(Candidate)
@@ -101,13 +124,21 @@ async def update_preferences(
             detail="Candidate not found."
         )
 
-    candidate.work_preferences = preferences.model_dump()
+    candidate.name = profile.name.strip()
+    candidate.email = profile.email.strip()
+    candidate.phone = profile.phone.strip()
+    candidate.location = profile.location.strip()
 
     db.commit()
     db.refresh(candidate)
 
     return {
-        "message": "Work preferences updated",
+        "message": "Basic profile updated successfully",
         "candidate_id": candidate.id,
-        "work_preferences": candidate.work_preferences,
+        "candidate": {
+            "name": candidate.name,
+            "email": candidate.email,
+            "phone": candidate.phone,
+            "location": candidate.location,
+        }
     }

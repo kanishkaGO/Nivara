@@ -8,7 +8,7 @@ from app.services.resume_parser import extract_resume_text
 
 
 router = APIRouter(
-    prefix="/resume",
+    prefix="/api/v1/resume",
     tags=["Resume"]
 )
 
