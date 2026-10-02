@@ -13,27 +13,31 @@ def _experience_range(value):
 
     text = str(value).lower()
 
+    month_match = re.search(r"(\d+(?:\.\d+)?)\s*months?", text)
+    if month_match:
+        months = float(month_match.group(1))
+        years = months / 12
+        return years, years
+
     match = re.search(
-        r"(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)",
+        r"(\d+(?:\.\d+)?)\s*(?:-|\s*to\s*)(\d+(?:\.\d+)?)",
         text,
     )
-
     if match:
         return float(match.group(1)), float(match.group(2))
 
     match = re.search(r"(\d+(?:\.\d+)?)\s*\+", text)
-
     if match:
         minimum = float(match.group(1))
         return minimum, None
 
     match = re.search(r"(\d+(?:\.\d+)?)\s*years?", text)
-
     if match:
         years = float(match.group(1))
         return years, years
 
     return None
+
 
 
 def generate_job_match(candidate, job: dict) -> MatchResult:
