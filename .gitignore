@@ -23,3 +23,5 @@ uploads/
 # IDE
 .vscode/
 .idea/
+
+backend/nivara.db
